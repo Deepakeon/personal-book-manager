@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
 import { generateJWT, setAuthCookie } from '@/lib/server/jwt';
 import { UserModel } from '@/lib/server/models/user.model';
+import { getMongoDbInstance } from '@/lib/server/mongodb';
 
 export async function POST(request: NextRequest) {
   try {
