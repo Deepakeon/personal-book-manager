@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "./lib/server/jwt";
-import { getMongoDbInstance } from "./lib/server/mongodb";
 
 const protectedRoutes = [
   '/library',
@@ -15,7 +14,6 @@ async function withAuthMiddleware(request: NextRequest) {
     path === route || path.startsWith(route + '/')
   );
   
-  await getMongoDbInstance()
   if (!isProtectedRoute) {
     return NextResponse.next();
   }

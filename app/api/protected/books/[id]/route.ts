@@ -2,8 +2,11 @@ import { withAuth } from "@/lib/server/middleware.server"
 import { BookModel } from "@/lib/server/models/book.model"
 import { NextResponse } from "next/server"
 import { Types } from "mongoose"
+import { getMongoDbInstance } from "@/lib/server/mongodb"
 
 export const GET = withAuth(async (req, user, context) => {
+      await getMongoDbInstance()
+
     const bookId = (await context?.params)?.id
     if (!bookId) {
         return NextResponse.json(
@@ -32,6 +35,8 @@ export const GET = withAuth(async (req, user, context) => {
 })
 
 export const PUT = withAuth(async (req, user, context) => {
+      await getMongoDbInstance()
+
     const bookId = (await context?.params)?.id
     if (!bookId) {
         return NextResponse.json(
@@ -81,6 +86,8 @@ export const PUT = withAuth(async (req, user, context) => {
 })
 
 export const DELETE = withAuth(async (_, user, context) => {
+      await getMongoDbInstance()
+
     const bookId = (await context?.params)?.id
     if (!bookId) {
         return NextResponse.json(
