@@ -1,26 +1,126 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --background: 40 20% 98%;
+  --foreground: 30 10% 12%;
+  --border: 35 15% 88%;
+  --input: 35 15% 88%;
+  --ring: 30 10% 12%;
+
+  --card: 40 25% 97%;
+  --card-foreground: 30 10% 12%;
+
+  --popover: 40 20% 98%;
+  --popover-foreground: 30 10% 12%;
+
+  --primary: 30 10% 12%;
+  --primary-foreground: 40 20% 98%;
+
+  --secondary: 35 20% 93%;
+  --secondary-foreground: 30 10% 12%;
+
+  --muted: 35 15% 93%;
+  --muted-foreground: 30 8% 50%;
+
+  --accent: 35 20% 93%;
+  --accent-foreground: 30 10% 12%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --radius: 0.75rem;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --status-want: 35 30% 90%;
+  --status-reading: 210 40% 90%;
+  --status-completed: 145 30% 88%;
+  --status-want-fg: 35 40% 35%;
+  --status-reading-fg: 210 50% 35%;
+  --status-completed-fg: 145 40% 30%;
+
+  --color-status-want: hsl(var(--status-want));
+  --color-status-want-fg: hsl(var(--status-want-fg));
+  --color-status-reading: hsl(var(--status-reading));
+  --color-status-reading-fg: hsl(var(--status-reading-fg));
+  --color-status-completed: hsl(var(--status-completed));
+  --color-status-completed-fg: hsl(var(--status-completed-fg));
+
+  --surface-warm: 30 25% 95%;
+  --surface-cool: 210 20% 96%;
+
+  --color-surface-warm: hsl(var(--surface-warm));
+  --color-surface-cool: hsl(var(--surface-cool));
+
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+
+  --color-sidebar: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  @apply border-border;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-background text-foreground font-sans antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+}
+
+@utility font-serif {
+  font-family: var(--font-serif);
+}
+
+@utility font-sans {
+  font-family: var(--font-sans);
 }
