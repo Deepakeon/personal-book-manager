@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { BookStatus, IBook } from "@/lib/shared/types/book.types";
 import Link from "next/link";
 import { useBooks } from "@/hooks/useBooks";
+import { bookValidationConfig, validateBook } from "@/lib/shared/validators/book.validator";
 
 const statusStyles: Record<BookStatus, string> = {
   want: "bg-status-want text-status-want-fg",
@@ -20,7 +21,7 @@ const statusLabels: Record<BookStatus, string> = {
 };
 
 const BookDetail = () => {
-  const { id } = useParams();
+  const id = useParams()?.id as string | null;
   const router = useRouter();
   const { getBookById, updateBook, deleteBook, isLoading } = useBooks();
   
@@ -31,12 +32,13 @@ const BookDetail = () => {
   const [status, setStatus] = useState<BookStatus>(BookStatus.WantToRead);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const errors = validateBook(title, author, tagInput, tags);
 
   useEffect(() => {
     if (id) {
       const fetchBook = async () => {
-        const bookData = await getBookById(id as string);
+        const bookData = await getBookById(id);
         if (bookData) {
           setBook(bookData);
           setTitle(bookData.title);
@@ -65,16 +67,11 @@ const BookDetail = () => {
   const handleSave = async () => {
     if (!id) return;
 
-    setIsSubmitting(true);
-    try {
-      const updatedBook = await updateBook(id as string, { title, author, status, tags });
+      const updatedBook = await updateBook(id, { title, author, status, tags });
       if (updatedBook) {
         setBook(updatedBook);
         setEditing(false);
       }
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   const handleDelete = async () => {
@@ -88,7 +85,7 @@ const BookDetail = () => {
 
   const addTag = (tag: string) => {
     const trimmed = tag.trim();
-    if (trimmed && !tags.includes(trimmed) && tags.length < 5 && trimmed.length <= 50) {
+    if (trimmed && !tags.includes(trimmed)) {
       setTags([...tags, trimmed]);
       setTagInput("");
     } else {
@@ -112,10 +109,10 @@ const BookDetail = () => {
               {editing ? (
                 <button
                   onClick={handleSave}
-                  disabled={isLoading || isSubmitting || !title.trim() || !author.trim() || title.trim().split(/\s+/).length > 100 || author.trim().split(/\s+/).length > 100 || title.length > 500 || author.length > 200}
+                  disabled={isLoading || Object.values(errors).some(Boolean)}
                   className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-sans font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
-                  {isSubmitting ? (
+                  {isLoading ? (
                     <span>Saving...</span>
                   ) : (
                     <>
@@ -147,28 +144,24 @@ const BookDetail = () => {
               <div className="flex justify-between">
                 <label className="text-sm text-muted-foreground font-sans">Title</label>
                 <div className="flex gap-2">
-                  <span className={`text-xs font-sans ${title.length > 500 ? 'text-red-500' : 'text-muted-foreground'}`}>
-                    {title.length}/500 chars
+                  <span className={`text-xs font-sans text-muted-foreground`}>
+                    {title.length}/{bookValidationConfig.titleMaxChars} chars
                   </span>
                 </div>
               </div>
               <input
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                className={`w-full bg-transparent text-4xl md:text-5xl font-serif font-semibold outline-none transition-colors ${
-                  title.trim().split(/\s+/).length > 100 || title.length > 500 ? 'border-red-500' : 'border-b border-border pb-2 focus:border-foreground'
-                }`}
+                className={`w-full bg-transparent text-4xl md:text-5xl font-serif font-semibold outline-none transition-colors border-b border-border pb-2 focus:border-foreground`}
               />
-              {(title.trim().split(/\s+/).length > 100 || title.length > 500) && (
+              {!!title.length && !!errors.title && (
                 <div className="space-y-1">
-                  {title.length > 500 && (
-                    <p className="text-red-500 text-xs font-sans">Title cannot exceed 500 characters</p>
-                  )}
+                  <p className="text-red-500 text-xs font-sans">{errors.title}</p>
                 </div>
               )}
             </div>
           ) : (
-            <h1 className="text-4xl md:text-5xl font-serif font-semibold mb-3">{book?.title}</h1>
+            <h1 className="text-4xl md:text-5xl font-serif font-semibold mb-3 w-full h-max wrap-break-word">{book?.title}</h1>
           )}
 
           {editing ? (
@@ -176,23 +169,19 @@ const BookDetail = () => {
               <div className="flex justify-between">
                 <label className="text-sm text-muted-foreground font-sans">Author</label>
                 <div className="flex gap-2">
-                  <span className={`text-xs font-sans ${author.length > 200 ? 'text-red-500' : 'text-muted-foreground'}`}>
-                    {author.length}/200 chars
+                  <span className={`text-xs font-sans text-muted-foreground`}>
+                    {author.length}/{bookValidationConfig.authorMaxChars} chars
                   </span>
                 </div>
               </div>
               <input
                 value={author}
                 onChange={e => setAuthor(e.target.value)}
-                className={`w-full bg-transparent text-xl font-sans text-muted-foreground outline-none transition-colors ${
-                  author.trim().split(/\s+/).length > 100 || author.length > 200 ? 'border-red-500' : 'border-b border-border pb-2 focus:border-foreground'
-                }`}
+                className={`w-full bg-transparent text-xl font-sans text-muted-foreground outline-none transition-colors border-b border-border pb-2 focus:border-foreground`}
               />
-              {(author.trim().split(/\s+/).length > 100 || author.length > 200) && (
+              {!!author.length && !!errors.author && (
                 <div className="space-y-1">
-                  {author.length > 200 && (
-                    <p className="text-red-500 text-xs font-sans">Author name cannot exceed 200 characters</p>
-                  )}
+                  <p className="text-red-500 text-xs font-sans">{errors.author}</p>
                 </div>
               )}
             </div>
@@ -225,7 +214,7 @@ const BookDetail = () => {
               <div className="flex justify-between">
                 <label className="text-sm text-muted-foreground font-sans">Tags</label>
                 <span className="text-xs text-muted-foreground font-sans">
-                  {tags.length}/5 tags
+                  {tags.length}/{bookValidationConfig.maxTags} tags
                 </span>
               </div>
               <div className="flex flex-wrap gap-2 mb-2">
@@ -246,13 +235,12 @@ const BookDetail = () => {
                 value={tagInput}
                 onChange={e => setTagInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag(tagInput); } }}
-                className={`w-full bg-transparent border-b py-3 text-sm font-sans text-foreground outline-none transition-colors ${tags.length >= 5 ? 'border-red-500' : 'border-border focus:border-foreground'
-                  }`}
-                placeholder={tags.length >= 5 ? "Maximum 5 tags allowed" : "+ Add tag"}
-                disabled={tags.length >= 5}
+                className={`w-full bg-transparent border-b py-3 text-sm font-sans text-foreground outline-none transition-colors border-border focus:border-foreground`}
+                placeholder={tags.length >= bookValidationConfig.maxTags ? `Maximum ${bookValidationConfig.maxTags} tags allowed` : "+ Add tag"}
+                disabled={tags.length >= bookValidationConfig.maxTags}
               />
-              {tagInput.length > 50 && (
-                <p className="text-red-500 text-xs font-sans">Tag cannot exceed 50 characters</p>
+              {!!tagInput.length && !!errors.tags && (
+                <p className="text-red-500 text-xs font-sans">{errors.tags}</p>
               )}
             </div>
           )}

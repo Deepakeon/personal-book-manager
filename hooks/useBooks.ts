@@ -5,7 +5,7 @@ import { toast } from "sonner"
 
 export const useBooks = () => {
     const setBooks = useBookStore((state) => state.setBooks)
-    const [isLoading, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
 
     const getBookByIds = useCallback(async() => {
         try{

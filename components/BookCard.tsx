@@ -22,10 +22,10 @@ const BookCard = ({ book, index }: BookCardProps) => {
       transition={{ duration: 0.4, delay: index * 0.05 }}
     >
       <Link href={`/library/${book._id}`}>
-        <div className="group py-8 border-b border-border hover:bg-card/50 transition-colors px-2 -mx-2 rounded-lg cursor-pointer">
-          <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-            <div className="flex-1 min-w-0">
-              <h3 className="text-2xl md:text-3xl font-serif font-medium mb-1 group-hover:-translate-y-0.5 transition-transform">
+        <div className="group flex flex-col py-8 border-b border-border hover:bg-card/50 transition-colors px-2 -mx-2 rounded-lg cursor-pointer h-max">
+          <div className="flex flex-col sm:items-start gap-4">
+            <div className="w-full">
+              <h3 className="text-2xl md:text-3xl font-serif font-medium mb-1 group-hover:-translate-y-0.5 transition-transform w-4/5 wrap-break-word">
                 {book.title}
               </h3>
               <p className="text-muted-foreground font-sans text-base">
@@ -33,7 +33,7 @@ const BookCard = ({ book, index }: BookCardProps) => {
               </p>
             </div>
 
-            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className={`px-3 py-1.5 rounded-full text-xs font-sans font-medium ${statusStyles[book.status]}`}>
                 {statusLabels[book.status]}
               </span>

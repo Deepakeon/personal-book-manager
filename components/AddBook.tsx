@@ -1,12 +1,18 @@
 "use client"
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { BookStatus, statusLabels } from "@/lib/shared/types/book.types";
-import { useBooks } from "@/hooks/useBooks";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 
-const statuses: BookStatus[] = [BookStatus.WantToRead, BookStatus.Reading, BookStatus.Completed];
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { BookStatus, statusLabels } from "@/lib/shared/types/book.types"
+import { useBooks } from "@/hooks/useBooks"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { bookValidationConfig, validateBook } from "@/lib/shared/validators/book.validator"
+
+const statuses: BookStatus[] = [
+  BookStatus.WantToRead,
+  BookStatus.Reading,
+  BookStatus.Completed
+]
 
 const statusTileStyles: Record<BookStatus, string> = {
   want: "border-status-want bg-status-want/30 text-status-want-fg",
@@ -20,40 +26,37 @@ const statusTileActive: Record<BookStatus, string> = {
   completed: "border-status-completed-fg bg-status-completed text-status-completed-fg ring-2 ring-status-completed-fg/30",
 };
 
+
 const AddBook = () => {
   const { addBook, isLoading } = useBooks()
-  const router = useRouter();
+  const router = useRouter()
 
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [status, setStatus] = useState<BookStatus>(BookStatus.WantToRead);
-  const [tagInput, setTagInput] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
-  const [showAuthorSuggestions, setShowAuthorSuggestions] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [title, setTitle] = useState("")
+  const [author, setAuthor] = useState("")
+  const [status, setStatus] = useState<BookStatus>(BookStatus.WantToRead)
+  const [tagInput, setTagInput] = useState("")
+  const [tags, setTags] = useState<string[]>([])
 
-  const addTag = (tag: string) => {
-    const trimmed = tag.trim();
-    if (trimmed && !tags.includes(trimmed) && tags.length < 5 && trimmed.length <= 50) {
-      setTags([...tags, trimmed]);
-      setTagInput("");
-    } else {
-      setTagInput("");
-    }
-  };
+  const errors = validateBook(title, author, tagInput, tags)
+
+  const addTag = () => {
+    const trimmed = tagInput.trim()
+    setTags([...tags, trimmed])
+    setTagInput("")
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim() || !author.trim()) return;
+    e.preventDefault()
 
-    setIsSubmitting(true);
-    try {
-      await addBook({ title: title.trim(), author: author.trim(), status, tags });
-      router.push("/library")
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    await addBook({
+      title: title.trim(),
+      author: author.trim(),
+      status,
+      tags
+    })
+
+    router.push("/library")
+  }
 
   return (
     <div className="h-dvh bg-background">
@@ -73,8 +76,8 @@ const AddBook = () => {
               <div className="flex justify-between">
                 <label className="text-sm text-muted-foreground font-sans">Title</label>
                 <div className="flex gap-2">
-                  <span className={`text-xs font-sans ${title.length > 500 ? 'text-red-500' : 'text-muted-foreground'}`}>
-                    {title.length}/500 chars
+                  <span className={`text-xs font-sans text-muted-foreground`}>
+                    {title.length}/{bookValidationConfig.titleMaxChars} chars
                   </span>
                 </div>
               </div>
@@ -82,17 +85,13 @@ const AddBook = () => {
                 type="text"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                className={`w-full bg-transparent border-b py-3 text-xl font-serif text-foreground outline-none transition-colors ${
-                  title.trim().split(/\s+/).length > 100 || title.length > 500 ? 'border-red-500' : 'border-border focus:border-foreground'
-                }`}
+                className={`w-full bg-transparent border-b py-3 text-xl font-serif text-foreground outline-none transition-colors border-border focus:border-foreground`}
                 placeholder="Book title..."
                 required
               />
-              {(title.trim().split(/\s+/).length > 100 || title.length > 500) && (
+              {!!title.length && !!errors.title && (
                 <div className="space-y-1">
-                  {title.length > 500 && (
-                    <p className="text-red-500 text-xs font-sans">Title cannot exceed 500 characters</p>
-                  )}
+                    <p className="text-red-500 text-xs font-sans">{errors.title}</p>
                 </div>
               )}
             </div>
@@ -101,28 +100,22 @@ const AddBook = () => {
               <div className="flex justify-between">
                 <label className="text-sm text-muted-foreground font-sans">Author</label>
                 <div className="flex gap-2">
-                  <span className={`text-xs font-sans ${author.length > 200 ? 'text-red-500' : 'text-muted-foreground'}`}>
-                    {author.length}/200 chars
+                  <span className={`text-xs font-sans text-muted-foreground`}>
+                    {author.length}/{bookValidationConfig.authorMaxChars} chars
                   </span>
                 </div>
               </div>
               <input
                 type="text"
                 value={author}
-                onChange={e => { setAuthor(e.target.value); setShowAuthorSuggestions(true); }}
-                onFocus={() => setShowAuthorSuggestions(true)}
-                onBlur={() => setTimeout(() => setShowAuthorSuggestions(false), 200)}
-                className={`w-full bg-transparent border-b py-3 text-lg font-sans text-foreground outline-none transition-colors ${
-                  author.trim().split(/\s+/).length > 100 || author.length > 200 ? 'border-red-500' : 'border-border focus:border-foreground'
-                }`}
+                onChange={e => { setAuthor(e.target.value); }}
+                className={`w-full bg-transparent border-b py-3 text-lg font-sans text-foreground outline-none transition-colors border-border focus:border-foreground`}
                 placeholder="Author name..."
                 required
               />
-              {(author.trim().split(/\s+/).length > 100 || author.length > 200) && (
+              {!!author.length && !!errors.author && (
                 <div className="space-y-1">
-                  {author.length > 200 && (
-                    <p className="text-red-500 text-xs font-sans">Author name cannot exceed 200 characters</p>
-                  )}
+                  <p className="text-red-500 text-xs font-sans">{errors.author}</p>
                 </div>
               )}
             </div>
@@ -148,17 +141,17 @@ const AddBook = () => {
               <div className="flex justify-between">
                 <label className="text-sm text-muted-foreground font-sans">Tags</label>
                 <span className="text-xs text-muted-foreground font-sans">
-                  {tags.length}/5 tags
+                  {tags.length}/{bookValidationConfig.maxTags} tags
                 </span>
               </div>
               <div className="flex flex-wrap gap-2 mb-2">
-                {tags.map(tag => (
+                {tags.map(t => (
                   <span
-                    key={tag}
+                    key={t}
                     className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-sans bg-secondary text-secondary-foreground"
                   >
-                    {tag}
-                    <button type="button" onClick={() => setTags(tags.filter(t => t !== tag))} className="ml-1 hover:text-foreground">
+                    {t}
+                    <button type="button" onClick={() => setTags(tags.filter(tag => tag !== t))} className="ml-1 hover:text-foreground">
                       ×
                     </button>
                   </span>
@@ -168,24 +161,24 @@ const AddBook = () => {
                 type="text"
                 value={tagInput}
                 onChange={e => setTagInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag(tagInput); } }}
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
                 className={`w-full bg-transparent border-b py-3 text-sm font-sans text-foreground outline-none transition-colors ${tags.length >= 5 ? 'border-red-500' : 'border-border focus:border-foreground'
                   }`}
-                placeholder={tags.length >= 5 ? "Maximum 5 tags allowed" : "Add a tag and press Enter..."}
-                disabled={tags.length >= 5}
+                placeholder={tags.length >= bookValidationConfig.maxTags ? `Maximum ${bookValidationConfig.maxTags} tags allowed` : "Add a tag and press Enter..."}
+                disabled={tags.length >= bookValidationConfig.maxTags}
               />
-              {tagInput.length > 50 && (
-                <p className="text-red-500 text-xs font-sans">Tag cannot exceed 50 characters</p>
+              {tagInput.length > bookValidationConfig.tagMaxChars && (
+                <p className="text-red-500 text-xs font-sans">Tag cannot exceed {bookValidationConfig.tagMaxChars} characters</p>
               )}
             </div>
 
             <motion.button
               type="submit"
-              disabled={isLoading || !title.trim() || !author.trim() || title.trim().split(/\s+/).length > 100 || author.trim().split(/\s+/).length > 100 || title.length > 500 || author.length > 200 || isSubmitting}
+              disabled={isLoading || Object.values(errors).some(Boolean)}
               className="w-full bg-primary text-primary-foreground py-4 rounded-full font-sans font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
               whileTap={{ scale: 0.98 }}
             >
-              {isSubmitting ? (
+              {isLoading ? (
                 <motion.span
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -200,7 +193,7 @@ const AddBook = () => {
         </motion.div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AddBook;
+export default AddBook
