@@ -186,7 +186,7 @@ const BookDetail = () => {
               )}
             </div>
           ) : (
-            <p className="text-xl font-sans text-muted-foreground mb-8">{book?.author}</p>
+            <p className="text-xl font-sans text-muted-foreground mb-8 wrap-break-word">{book?.author}</p>
           )}
 
           {editing ? (

@@ -25,10 +25,10 @@ const BookCard = ({ book, index }: BookCardProps) => {
         <div className="group flex flex-col py-8 border-b border-border hover:bg-card/50 transition-colors px-2 -mx-2 rounded-lg cursor-pointer h-max">
           <div className="flex flex-col sm:items-start gap-4">
             <div className="w-full">
-              <h3 className="text-2xl md:text-3xl font-serif font-medium mb-1 group-hover:-translate-y-0.5 transition-transform w-4/5 wrap-break-word">
+              <h3 className="text-2xl md:text-3xl font-serif font-medium mb-1 group-hover:-translate-y-0.5 transition-transform wrap-break-word">
                 {book.title}
               </h3>
-              <p className="text-muted-foreground font-sans text-base">
+              <p className="text-muted-foreground font-sans text-base wrap-break-word">
                 {book.author}
               </p>
             </div>
