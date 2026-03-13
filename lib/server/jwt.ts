@@ -29,27 +29,27 @@ export async function verifyJWT(token: string): Promise<JWTPayloadWithUserId | n
   }
 }
 
-export async function setAuthCookie(token: string): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.set('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7 // 7 days
-  });
-}
+// async function setAuthCookie(token: string): Promise<void> {
+//   const cookieStore = await cookies();
+//   cookieStore.set('token', token, {
+//     httpOnly: true,
+//     secure: process.env.NODE_ENV === 'production',
+//     sameSite: 'strict',
+//     path: '/',
+//     maxAge: 60 * 60 * 24 * 7 // 7 days
+//   });
+// }
 
-export async function clearAuthCookie(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.set('token', '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    path: '/',
-    maxAge: 0
-  });
-}
+// export async function clearAuthCookie(): Promise<void> {
+//   const cookieStore = await cookies();
+//   cookieStore.set('token', '', {
+//     httpOnly: true,
+//     secure: process.env.NODE_ENV === 'production',
+//     sameSite: 'strict',
+//     path: '/',
+//     maxAge: 0
+//   });
+// }
 
 export async function getAuthCookie(): Promise<string | undefined> {
   const cookieStore = await cookies();

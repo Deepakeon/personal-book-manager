@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
-import { generateJWT, setAuthCookie } from '@/lib/server/jwt';
+import { generateJWT } from '@/lib/server/jwt';
 import { UserModel } from '@/lib/server/models/user.model';
 import { getMongoDbInstance } from '@/lib/server/mongodb';
+import { CookieExpiryInMs } from '@/lib/constants';
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,12 +38,14 @@ export async function POST(request: NextRequest) {
 
     const token = await generateJWT(user._id.toString(), user.email);
 
-    await setAuthCookie(token);
-
     return NextResponse.json({
       success: true,
       user: {
         email: user.email
+      }
+    }, {
+      headers: {
+        'Set-Cookie': `token=${token}; HttpOnly; Path=/; Max-Age=${CookieExpiryInMs}; sameSite=Strict; ${process.env.NODE_ENV === 'production' ? 'Secure' : ''}`
       }
     });
 
