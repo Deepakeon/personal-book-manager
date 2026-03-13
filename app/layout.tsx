@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next"
 import type { Metadata } from "next";
 import "./globals.css";
 import { Playfair_Display, DM_Sans } from "next/font/google"
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body
         className={`${playfair.variable} ${dmSans.variable} antialiased`}
       >
+        <Analytics/>
         <Toaster />
         {children}
       </body>
