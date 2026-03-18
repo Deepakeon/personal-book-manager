@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/LogoutButton";
+import CommandPalette from "@/components/CommandPalette";
 
 export default async function ProtectedLayout({
   children,
@@ -9,7 +10,7 @@ export default async function ProtectedLayout({
 }) {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
-  
+
   if (!token) {
     redirect("/auth/login");
   }
@@ -18,8 +19,8 @@ export default async function ProtectedLayout({
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="max-w-3xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl font-serif font-semibold">Personal Book Manager</h1>
+          <div className="flex items-center justify-between gap-2">
+            <CommandPalette />
             <LogoutButton />
           </div>
         </div>
