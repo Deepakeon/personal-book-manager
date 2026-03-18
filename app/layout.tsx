@@ -31,7 +31,7 @@ export default function RootLayout({
       <body
         className={`${playfair.variable} ${dmSans.variable} antialiased`}
       >
-        {/* <Analytics/> */}
+        <Analytics/>
         <Toaster />
         {children}
       </body>
